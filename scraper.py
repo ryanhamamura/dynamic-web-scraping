@@ -16,6 +16,19 @@ def main():
     wait.until(EC.url_to_be(val))
     if get_url == val:
         page_source = driver.page_source
+    soup = BeautifulSoup(page_source, features='html.parser')
+    keyword = input("Enter a keyword to find instances of in the article: ")
+    matches = soup.body.find_all(string=re.compile(keyword))
+    len_match = len(matches)
+    title = soup.title.text
+    print(title)
+    count = 1
+    for i in matches:
+        print(f'{count}. {i} \n')
+        count += 1
+    print(f'There were {str(len_match)} matches found for the keyword.')
+     
+    driver.quit()
 
 if __name__ == "__main__":
     main()
