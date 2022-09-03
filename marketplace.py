@@ -14,7 +14,7 @@ def main():
     wait = WebDriverWait(driver, 10)
     val = 'https://www.facebook.com/marketplace/honolulu/search/?query='
     keyword = input("Enter search marketplace search keyword: ")
-    val = val + keyword + '&exact=false'
+    val = val + keyword
     driver.get(val)
     get_url = driver.current_url
     wait.until(EC.url_to_be(val))
