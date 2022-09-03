@@ -127,3 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Marketplace image results
+market_search.png
+search_results.png
+
