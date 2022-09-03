@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import codecs
 import re
 from webdriver_manager.chrome import ChromeDriverManager
+from parsel import Selector
 
 def main():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
@@ -19,14 +20,18 @@ def main():
     get_url = driver.current_url
     wait.until(EC.url_to_be(val))
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    if get_url == val:
+    sel = Selector(text=driver.page_source)
+    items = sel.xpath("//a[@role]//img[@alt]") 
+    for item in items:
+        print(item.css('img::attr(alt)').get())
+    # if get_url == val:
         # page_source = driver.page_source
-        search = driver.find_elements(by=By.TAG_NAME, value='img')
-        alts = driver.find_elements(by=By.TAG_NAME, value='img')
-        alts = [alt.get_dom_attribute('alt') for alt in alts]
-        for alt in alts:
-            print(alt)
-        driver.save_screenshot('search_results.png')
+        # search = driver.find_elements(by=By.TAG_NAME, value='img')
+        # alts = driver.find_elements(by=By.TAG_NAME, value='img')
+        # alts = [alt.get_dom_attribute('alt') for alt in alts]
+        # for alt in alts:
+        #     print(alt)
+        # driver.save_screenshot('search_results.png')
     cont = input("Are you done? (y/n)")
     driver.quit()
 
