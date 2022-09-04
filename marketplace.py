@@ -6,8 +6,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
-import codecs
-import re
 from webdriver_manager.chrome import ChromeDriverManager
 from parsel import Selector
 from pprint import pp
@@ -33,7 +31,6 @@ def main():
     wait.until(EC.url_to_be(val))
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     sel = Selector(text=driver.page_source)
-    # items = sel.xpath("//a[@role]//img[@alt]") 
     items = sel.xpath("//a[@role]//div//span//div//span[@class][@dir]")
     state = 'current_price'
     parsed = [{
@@ -90,9 +87,7 @@ def main():
         else:
             print("undefined state") 
     pp(parsed, indent=4)
-    with open('output.txt', mode='w') as file:
-        pp(parsed, indent=4, stream=file)
-    cont = input("Are you done? (y/n)")
+    cont = input("Press any key to continue...")
     con.close()
     driver.quit()
 
