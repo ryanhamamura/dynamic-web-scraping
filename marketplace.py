@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
@@ -12,7 +13,11 @@ from parsel import Selector
 from pprint import pp
 
 def main():
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    options = Options()
+    options.headless = True  # hide GUI
+    options.add_argument('--window-size=1920,1080')  # set window size
+    options.add_argument('start-maximized')  # ensure window is maximized
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     wait = WebDriverWait(driver, 10)
     val = 'https://www.facebook.com/marketplace/honolulu/search/?query='
     keyword = input("Enter search marketplace search keyword: ")
@@ -60,6 +65,7 @@ def main():
             count += 1
         else:
             print("undefined state") 
+    pp(parsed, indent=4)
     with open('output.txt', mode='w') as file:
         pp(parsed, indent=4, stream=file)
     cont = input("Are you done? (y/n)")
