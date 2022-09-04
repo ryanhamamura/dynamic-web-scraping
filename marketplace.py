@@ -29,9 +29,6 @@ def main():
     count = 0
     for item in items:
         text = item.css('span::text').get()
-        # print(text)
-    for item in items:
-        text = item.css('span::text').get()
         # print(f'[DEBUG] text is {text}')
         if state == 'current_price':
             # print(f'[DEBUG] state is {state}')
@@ -63,7 +60,8 @@ def main():
             count += 1
         else:
             print("undefined state") 
-    pp(parsed)
+    with open('output.txt', mode='w') as file:
+        pp(parsed, indent=4, stream=file)
     cont = input("Are you done? (y/n)")
     driver.quit()
 
