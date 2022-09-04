@@ -35,7 +35,7 @@ def main():
         # print(f'[DEBUG] text is {text}')
         if state == 'current_price':
             # print(f'[DEBUG] state is {state}')
-            if len(parsed) > count:
+            if len(parsed) <= count:
                 parsed.append({})
             parsed[count]['current_price'] = text
             # print(f'[DEBUG] {listing}')
