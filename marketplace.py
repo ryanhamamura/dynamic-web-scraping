@@ -13,9 +13,7 @@ import sqlite3
 import datetime
 
 def main():
-    # database connection
-    con = sqlite3.connect('marketplace.db')
-    # Chrome Driver options
+   # Chrome Driver options
     options = Options()
     options.headless = True  # hide GUI
     options.add_argument('--window-size=1920,1080')  # set window size
@@ -79,15 +77,21 @@ def main():
             # print(f'[DEBUG] {listing}')
             state = 'current_price'
             try:
+                # database connection
+                con = sqlite3.connect('marketplace.db')
                 with con:
-                    con.execute("INSERT INTO listings VALUES(:title, :current_price, :previous_price, :location, :listing_date)", parsed[count])
+                    cur = con.execute("UPDATE listings SET current_price = :current_price, previous_price = :previous_price WHERE title = :title AND location = :location", parsed[count])
+                    print(f'[DEBUG] cur.rowcount is {cur.rowcount}')
+                    if cur.rowcount == 0:
+                        con.execute("INSERT INTO listings VALUES(:title, :current_price, :previous_price, :location, :listing_date)", parsed[count])
+                        pp(f'[DEBUG] New row added: {parsed[count]}', indent=4)   
+                    con.commit()
             except sqlite3.IntegrityError:
                 print("couldn't add values twice")
             count += 1
         else:
             print("undefined state") 
-    pp(parsed, indent=4)
-    cont = input("Press any key to continue...")
+    # pp(parsed, indent=4)
     con.close()
     driver.quit()
 
