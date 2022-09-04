@@ -11,12 +11,18 @@ import re
 from webdriver_manager.chrome import ChromeDriverManager
 from parsel import Selector
 from pprint import pp
+import sqlite3
+import datetime
 
 def main():
+    # database connection
+    con = sqlite3.connect('marketplace.db')
+    # Chrome Driver options
     options = Options()
     options.headless = True  # hide GUI
     options.add_argument('--window-size=1920,1080')  # set window size
     options.add_argument('start-maximized')  # ensure window is maximized
+    # Start Chrome driver
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     wait = WebDriverWait(driver, 10)
     val = 'https://www.facebook.com/marketplace/honolulu/search/?query='
@@ -30,7 +36,13 @@ def main():
     # items = sel.xpath("//a[@role]//img[@alt]") 
     items = sel.xpath("//a[@role]//div//span//div//span[@class][@dir]")
     state = 'current_price'
-    parsed = [{},]
+    parsed = [{
+        'title': '',
+        'current_price': '',
+        'previous_price': '',
+        'location': '',
+        'listing_date': '',
+    },]
     count = 0
     for item in items:
         text = item.css('span::text').get()
@@ -38,7 +50,13 @@ def main():
         if state == 'current_price':
             # print(f'[DEBUG] state is {state}')
             if len(parsed) <= count:
-                parsed.append({})
+                parsed.append({
+                    'title': '',
+                    'current_price': '',
+                    'previous_price': '',
+                    'location': '',
+                    'listing_date': '',
+                })
             parsed[count]['current_price'] = text
             # print(f'[DEBUG] {listing}')
             state = 'previous_price'
@@ -60,8 +78,14 @@ def main():
         elif state == 'location':
             # print(f'[DEBUG] state is {state}')
             parsed[count]['location'] = text
+            parsed[count]['listing_date'] = datetime.date.today()
             # print(f'[DEBUG] {listing}')
             state = 'current_price'
+            try:
+                with con:
+                    con.execute("INSERT INTO listings VALUES(:title, :current_price, :previous_price, :location, :listing_date)", parsed[count])
+            except sqlite3.IntegrityError:
+                print("couldn't add values twice")
             count += 1
         else:
             print("undefined state") 
@@ -69,6 +93,7 @@ def main():
     with open('output.txt', mode='w') as file:
         pp(parsed, indent=4, stream=file)
     cont = input("Are you done? (y/n)")
+    con.close()
     driver.quit()
 
 if __name__ == "__main__":
